@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Coffee Tycoon</string>
+    <string name="title_activity_main">Coffee Tycoon</string>
+    <string name="package_name">com.coffeetycoon.app</string>
+    <string name="custom_url_scheme">com.coffeetycoon.app</string>
+</resources>
