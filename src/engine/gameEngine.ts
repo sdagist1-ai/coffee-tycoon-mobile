@@ -19,7 +19,6 @@ import {
   LOCATION_SCARCITY,
   COMPETITOR_EXPANSION,
   TECH_BOOST,
-  FEEDBACK_TEMPLATES,
 } from "./constants";
 
 // ─── ID Generation ─────────────────────────────────────────────
@@ -676,8 +675,8 @@ export function createNewGame(params: CreateNewGameParams): GameState {
 
 function applyAdminMode(
   state: GameState,
-  companyName: string,
-  loc: (typeof LOCATIONS)[number],
+  _companyName: string,
+  _loc: (typeof LOCATIONS)[number],
   selectedCity: string,
 ): GameState {
   const newCompany: Company = {

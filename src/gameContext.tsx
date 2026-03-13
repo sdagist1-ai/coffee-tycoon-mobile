@@ -41,6 +41,7 @@ function toGameData(state: GameState): GameData {
       locationLabel: LOCATIONS.find((l) => l.key === s.location)?.label ?? s.location,
       cityLabel: CITIES.find((c) => c.key === s.city)?.label ?? s.city,
       customerFeedback: s.customerFeedback ?? [],
+      weeklyProfit: s.weeklyRevenue - s.weeklyCogs - s.weeklyLabor - s.weeklyRent,
     })),
     menu: state.menu,
     competitors: state.competitors.map((c) => ({
@@ -102,12 +103,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const performAction = useCallback((params: ActionParams) => {
     if (!state) return;
-    updateState(enginePerformAction(state, params.action, {
+    const result = enginePerformAction(state, params.action, {
       storeId: params.storeId,
       itemId: params.itemId,
       value: params.value,
       stringValue: params.stringValue,
-    }));
+    });
+    if (result.success) updateState(result.state);
   }, [state, updateState]);
 
   const resetGame = useCallback(() => {
@@ -117,42 +119,50 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const applyForLoan = useCallback((amount: number) => {
     if (!state) return;
-    updateState(engineApplyForLoan(state, amount));
+    const result = engineApplyForLoan(state, amount);
+    if (result.success) updateState(result.state);
   }, [state, updateState]);
 
   const applyForLoc = useCallback(() => {
     if (!state) return;
-    updateState(engineApplyForLoc(state));
+    const result = engineApplyForLoc(state);
+    if (result.success) updateState(result.state);
   }, [state, updateState]);
 
   const drawFromLoc = useCallback((amount: number) => {
     if (!state) return;
-    updateState(engineDrawFromLoc(state, amount));
+    const result = engineDrawFromLoc(state, amount);
+    if (result.success) updateState(result.state);
   }, [state, updateState]);
 
   const repayLoc = useCallback((amount: number) => {
     if (!state) return;
-    updateState(engineRepayLoc(state, amount));
+    const result = engineRepayLoc(state, amount);
+    if (result.success) updateState(result.state);
   }, [state, updateState]);
 
   const buyStock = useCallback((companyName: string, shares: number) => {
     if (!state) return;
-    updateState(engineBuyStock(state, companyName, shares));
+    const result = engineBuyStock(state, companyName, shares);
+    if (result.success) updateState(result.state);
   }, [state, updateState]);
 
   const sellStock = useCallback((investmentId: number, shares: number) => {
     if (!state) return;
-    updateState(engineSellStock(state, investmentId, shares));
+    const result = engineSellStock(state, investmentId, shares);
+    if (result.success) updateState(result.state);
   }, [state, updateState]);
 
   const investInTechRd = useCallback((tech: string, speedTier: string) => {
     if (!state) return;
-    updateState(engineInvestInTechRd(state, tech, speedTier));
+    const result = engineInvestInTechRd(state, tech, speedTier);
+    if (result.success) updateState(result.state);
   }, [state, updateState]);
 
   const hireCfo = useCallback(() => {
     if (!state) return;
-    updateState(engineHireCfo(state));
+    const result = engineHireCfo(state);
+    if (result.success) updateState(result.state);
   }, [state, updateState]);
 
   const loanOffers = state ? engineGetLoanOffers(state) : null;

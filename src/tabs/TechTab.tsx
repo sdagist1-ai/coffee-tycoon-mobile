@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Star, Cpu, Package, Truck } from "lucide-react";
+import { Cpu, Package, Truck } from "lucide-react";
 import { useGame } from "../gameContext";
 import type { GameData, TechProjectData } from "../types";
 import { SectionCard, StarRating, $w } from "../shared";
