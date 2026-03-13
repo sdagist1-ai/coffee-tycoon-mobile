@@ -1,12 +1,12 @@
 import "./index.css";
 import { useState } from "react";
 import {
-  Coffee, RotateCcw, Building2, Globe, Landmark,
+  RotateCcw, Building2, Globe, Landmark,
   LayoutDashboard, Store, BookOpen, Building, CreditCard, Cpu,
 } from "lucide-react";
 import type { CompanyData, Tab } from "./types";
 import { useGame, GameProvider } from "./gameContext";
-import { weekToDate, profitColor, BRAND_LOGOS } from "./shared";
+import { weekToDate, profitColor, BRAND_LOGOS, brandLogoEmoji } from "./shared";
 import { DashboardTab } from "./tabs/DashboardTab";
 import { StoresTab } from "./tabs/StoresTab";
 import { MenuTab } from "./tabs/MenuTab";
@@ -273,22 +273,22 @@ function GameShell() {
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <Coffee className="w-5 h-5 text-amber-500 shrink-0"  />
-                <h1 className="text-lg font-bold text-amber-100 truncate">{data.company.name}</h1>
+                <span className="text-xl shrink-0">{brandLogoEmoji(data.company.brandLogo)}</span>
+                <h1 className="text-xl font-bold text-amber-100 truncate">{data.company.name}</h1>
               </div>
               <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                <span className="text-amber-400/50 text-xs">{weekToDate(data.company.startDate, data.company.week)}</span>
-                <span className="px-2 py-0.5 bg-amber-600/20 text-amber-400 text-[10px] font-semibold rounded-full uppercase tracking-wider">
+                <span className="text-amber-400/50 text-sm">{weekToDate(data.company.startDate, data.company.week)}</span>
+                <span className="px-2 py-0.5 bg-amber-600/20 text-amber-400 text-xs font-semibold rounded-full uppercase tracking-wider">
                   {data.company.phase}
                 </span>
-                <span className="text-amber-100 text-xs font-semibold">${data.company.cash.toLocaleString()}</span>
+                <span className="text-amber-100 text-sm font-semibold">${data.company.cash.toLocaleString()}</span>
               </div>
             </div>
-            <div className="text-right shrink-0 ml-2">`
-              <div className={`text-sm font-bold ${profitColor(data.company.weeklyProfit)}`}>
+            <div className="text-right shrink-0 ml-2">
+              <div className={`text-base font-bold ${profitColor(data.company.weeklyProfit)}`}>
                 {data.company.weeklyProfit >= 0 ? "+" : ""}${data.company.weeklyProfit.toLocaleString()}
               </div>
-              <div className="text-amber-500/40 text-[10px]">weekly profit</div>
+              <div className="text-amber-500/40 text-xs">weekly profit</div>
             </div>
           </div>
         </div>
@@ -310,8 +310,8 @@ function GameShell() {
           {tabs.map((t) => (
             <button key={t.key} type="button" onClick={() => setTab(t.key)}
               className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 cursor-default transition-colors ${tab === t.key ? "text-amber-400" : "text-amber-600/40"}`}>
-              <t.icon className="w-4 h-4" />
-              <span className="text-[9px] font-semibold">{t.label}</span>
+              <t.icon className="w-5 h-5" />
+              <span className="text-[11px] font-semibold">{t.label}</span>
             </button>
           ))}
         </div>

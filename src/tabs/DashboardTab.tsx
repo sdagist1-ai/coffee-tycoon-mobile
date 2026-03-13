@@ -34,14 +34,14 @@ export function DashboardTab({ data, onCityClick }: { data: GameData; onCityClic
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <Calendar className="w-3.5 h-3.5 text-amber-400/60" />
-          <span className="text-amber-100 text-sm font-bold">{weekToDate(company.startDate, company.week)}</span>
+          <span className="text-amber-100 text-base font-bold">{weekToDate(company.startDate, company.week)}</span>
         </div>
-        <span className="text-amber-500/40 text-[10px]">Week {company.week}</span>
+        <span className="text-amber-500/40 text-xs">Week {company.week}</span>
       </div>
 
       <button type="button" onClick={() => advanceWeek()} disabled={false}
         className="w-full py-3.5 bg-gradient-to-r from-amber-600 to-amber-700 text-amber-50 font-bold rounded-lg disabled:opacity-50 cursor-default flex items-center justify-center gap-2">
-        <Play className="w-4 h-4" />Advance to {weekToDate(company.startDate, company.week + 1)}
+        <Play className="w-5 h-5" />Advance to {weekToDate(company.startDate, company.week + 1)}
       </button>
 
       <div className="grid grid-cols-2 gap-2.5">
@@ -54,24 +54,24 @@ export function DashboardTab({ data, onCityClick }: { data: GameData; onCityClic
       {/* Store Performance by City */}
       {storeList.length > 0 && (
         <div className="space-y-2">
-          <div className="text-amber-400/60 text-[10px] uppercase tracking-wider">Performance by Location</div>
+          <div className="text-amber-400/60 text-xs uppercase tracking-wider">Performance by Location</div>
           {Object.entries(storesByCity).map(([cityKey, cityData]) => (
             <button key={cityKey} type="button" onClick={() => onCityClick(cityKey)}
               className="w-full bg-amber-950/20 border border-amber-800/15 rounded-lg p-3 text-left cursor-default hover:border-amber-700/30 transition-colors">
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-2">
                   <Globe className="w-3.5 h-3.5 text-amber-400/60" />
-                  <span className="text-amber-100 text-sm font-bold">{cityData.cityLabel}</span>
-                  <span className="text-amber-500/40 text-[10px]">{cityData.stores.length} store{cityData.stores.length !== 1 ? "s" : ""}</span>
+                  <span className="text-amber-100 text-base font-bold">{cityData.cityLabel}</span>
+                  <span className="text-amber-500/40 text-xs">{cityData.stores.length} store{cityData.stores.length !== 1 ? "s" : ""}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className={`text-sm font-bold ${profitColor(cityData.totalProfit)}`}>
+                  <span className={`text-base font-bold ${profitColor(cityData.totalProfit)}`}>
                     {cityData.totalProfit >= 0 ? "+" : ""}${cityData.totalProfit.toLocaleString()}
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 text-amber-400/30" />
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-[10px] text-amber-400/40">
+              <div className="flex items-center gap-4 text-xs text-amber-400/40">
                 <span>Rev: ${cityData.totalRevenue.toLocaleString()}/wk</span>
                 <span>{cityData.totalCustomers.toLocaleString()} customers/wk</span>
               </div>
@@ -83,7 +83,7 @@ export function DashboardTab({ data, onCityClick }: { data: GameData; onCityClic
       {comps.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-2">
-            <div className="text-amber-400/60 text-xs font-semibold uppercase tracking-wider">Competitors</div>
+            <div className="text-amber-400/60 text-sm font-semibold uppercase tracking-wider">Competitors</div>
             {company.difficulty === "tycoon" && <span className="text-red-400/50 text-[9px]">Aggressive Market</span>}
             {company.difficulty === "easy" && <span className="text-emerald-400/50 text-[9px]">Relaxed Market</span>}
           </div>
@@ -97,10 +97,10 @@ export function DashboardTab({ data, onCityClick }: { data: GameData; onCityClic
                 <div key={c.id} className="px-3 py-2 bg-amber-950/15 border border-amber-800/10 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-amber-200/80 text-xs font-semibold">{c.name}</div>
-                      <div className="text-amber-500/40 text-[10px]">{c.cityLabel} {c.isPublic && <span className="text-emerald-400/60">PUBLIC</span>}</div>
+                      <div className="text-amber-200/80 text-sm font-semibold">{c.name}</div>
+                      <div className="text-amber-500/40 text-xs">{c.cityLabel} {c.isPublic && <span className="text-emerald-400/60">PUBLIC</span>}</div>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px]">
+                    <div className="flex items-center gap-2 text-xs">
                       {c.intelLevel >= 1 ? (
                         <>
                           <span className="text-amber-400/50">Rep {c.reputation}</span>
@@ -112,7 +112,7 @@ export function DashboardTab({ data, onCityClick }: { data: GameData; onCityClic
                     </div>
                   </div>
                   {c.intelLevel >= 2 && (
-                    <div className="mt-1 flex items-center gap-3 text-[10px] text-amber-400/40">
+                    <div className="mt-1 flex items-center gap-3 text-xs text-amber-400/40">
                       <span>Est. Revenue: ${c.estimatedRevenue.toLocaleString()}/wk</span>
                       <span>Strength: {c.strength}</span>
                     </div>
@@ -122,7 +122,7 @@ export function DashboardTab({ data, onCityClick }: { data: GameData; onCityClic
                       {c.intelLevel < 1 && (
                         <button type="button" onClick={() => performAction({ action: "buy_intel", value: c.id, stringValue: "standard" })}
                           disabled={false}
-                          className="flex items-center gap-1 px-2 py-1 bg-amber-950/30 border border-amber-800/20 rounded text-[9px] text-amber-300/60 cursor-default">
+                          className="flex items-center gap-1 px-2 py-1 bg-amber-950/30 border border-amber-800/20 rounded text-xs text-amber-300/60 cursor-default">
                           <Search className="w-2.5 h-2.5" />Intel ${(standardCost / 1000).toFixed(1)}k
                         </button>
                       )}
@@ -143,15 +143,15 @@ export function DashboardTab({ data, onCityClick }: { data: GameData; onCityClic
       )}
 
       <div>
-        <div className="text-amber-400/60 text-xs font-semibold uppercase tracking-wider mb-2">Recent Events</div>
+        <div className="text-amber-400/60 text-sm font-semibold uppercase tracking-wider mb-2">Recent Events</div>
         <div className="space-y-1.5">
           {events.length === 0 ? (
-            <div className="text-amber-500/30 text-xs text-center py-4">No events yet. End your first week!</div>
+            <div className="text-amber-500/30 text-sm text-center py-4">No events yet. End your first week!</div>
           ) : visibleEvents.map((e) => <EventItem key={e.id} event={e} startDate={company.startDate} />)}
         </div>
         {events.length > 5 && (
           <button type="button" onClick={() => setShowAllEvents(!showAllEvents)}
-            className="w-full mt-2 py-1.5 text-amber-400/50 text-[10px] cursor-default">
+            className="w-full mt-2 py-1.5 text-amber-400/50 text-xs cursor-default">
             {showAllEvents ? "Show less" : `Show all ${events.length} events`}
           </button>
         )}
