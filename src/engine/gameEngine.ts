@@ -372,11 +372,18 @@ function simulateStore(
   const beanQuality = bean.qualityMult;
   const overallQuality = (equipmentQuality * 0.4 + decorQuality * 0.2 + beanQuality * 0.4);
 
-  // Average menu price (in cents)
+  // Average menu price and cost (in cents)
   const avgPrice = enabledMenuList.length > 0
     ? enabledMenuList.reduce((sum, item) => sum + item.price, 0) / enabledMenuList.length
     : 400;
-  const priceFactor = Math.max(0.5, 1.3 - (avgPrice / 800)); // higher prices = fewer customers
+  const avgCost = enabledMenuList.length > 0
+    ? enabledMenuList.reduce((sum, item) => sum + item.cost, 0) / enabledMenuList.length
+    : 100;
+  // Supply/demand: markup ratio drives customer loss. At 2x markup = mild drop, at 5x+ = severe drop
+  const markupRatio = avgCost > 0 ? avgPrice / avgCost : 4;
+  // Sweet spot is 2x-3x markup. Beyond that, customers drop sharply.
+  // At 2x: factor ~1.0, at 5x: factor ~0.45, at 10x: factor ~0.15, at 16x (94% margin): factor ~0.05
+  const priceFactor = Math.max(0.05, Math.min(1.1, 1.6 - (markupRatio * 0.2) - Math.max(0, markupRatio - 3) * 0.15));
 
   const reputationFactor = 0.4 + (companyReputation / 100) * 0.8;
   const trafficBase = loc.traffic / 7; // weekly to daily-equivalent
@@ -414,8 +421,9 @@ function simulateStore(
   // Apply city rent multiplier
   const adjustedRent = Math.round(store.weeklyRent * city.rentMult);
 
-  // Per-store ratings (0-50, representing 0.0-5.0 x10)
-  const priceRating = Math.round(Math.min(50, Math.max(5, (1.3 - avgPrice / 600) * 35)));
+  
+  // Price rating based on markup: 2x markup = great (45), 5x = mediocre (25), 10x+ = terrible (5)
+  const priceRating = Math.round(Math.min(50, Math.max(5, 55 - markupRatio * 5)));
   const productRating = Math.round(Math.min(50, (beanQuality * 25 + (enabledMenuList.length / 8) * 15 + equipmentQuality * 10)));
   const serviceRating = Math.round(Math.min(50, (staffRatio * 30 + (store.hasManager ? 12 : 0) + (store.baristas / 8) * 8)));
   const atmosphereRating = Math.round(Math.min(50, (decorQuality * 40 + equipmentQuality * 10)));

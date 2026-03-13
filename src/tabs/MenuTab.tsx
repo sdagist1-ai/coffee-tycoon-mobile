@@ -92,9 +92,9 @@ function MenuItemCard({ item, performAction }: { item: MenuItemData; performActi
           {/* Slider */}
           <input type="range"
             min={Math.round(minPrice * 100)}
-            max={Math.round(maxPrice * 100)}
+            max={maxPriceCents}
             step={25}
-            value={item.price}
+            value={Math.min(item.price, maxPriceCents)}
             onChange={handleSlider}
             className="w-full h-1.5 appearance-none bg-amber-800/30 rounded-full accent-amber-500 cursor-default"
           />
