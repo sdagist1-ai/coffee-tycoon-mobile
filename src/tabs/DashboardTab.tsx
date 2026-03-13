@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  DollarSign, TrendingUp, Star, Store, Play, ChevronRight,
+  DollarSign, TrendingUp, TrendingDown, Star, Store, Play, ChevronRight,
   Globe, Search, Eye, Calendar,
 } from "lucide-react";
 import { useGame } from "../gameContext";
@@ -46,7 +46,7 @@ export function DashboardTab({ data, onCityClick }: { data: GameData; onCityClic
 
       <div className="grid grid-cols-2 gap-2.5">
         <MetricCard icon={DollarSign} label="Cash" value={$w(company.cash)} color="text-amber-100" />
-        <MetricCard icon={TrendingUp} label="Weekly Profit" value={`${company.weeklyProfit >= 0 ? "+" : ""}${$w(company.weeklyProfit)}`} color={profitColor(company.weeklyProfit)} />
+        <MetricCard icon={company.weeklyProfit >= 0 ? TrendingUp : TrendingDown} label="Weekly Profit" value={`${company.weeklyProfit >= 0 ? "+" : ""}${$w(company.weeklyProfit)}`} color={profitColor(company.weeklyProfit)} />
         <MetricCard icon={Store} label="Stores" value={storeList.length.toString()} color="text-sky-300" />
         <MetricCard icon={Star} label="Reputation" value={`${company.reputation}/100`} color="text-amber-400" />
       </div>

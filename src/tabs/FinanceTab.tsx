@@ -79,7 +79,7 @@ export function FinanceTab({ data }: { data: GameData }) {
                     <span>Maturity: {offer.maturity} wks</span>
                     <span>Payment: ${offer.weeklyPayment.toLocaleString()}/wk</span>
                   </div>
-                  <button type="button" onClick={() => { game.applyForLoan(offer.amount); setLoanAmount(""); }}
+                  <button type="button" onClick={() => { game.applyForLoan(offer.amount, offer.maturity); setLoanAmount(""); }}
                     disabled={company.cash < 0}
                     className="w-full py-1.5 bg-amber-600/80 text-amber-50 font-bold rounded text-[10px] disabled:opacity-40 cursor-default">
                     Apply

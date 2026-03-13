@@ -14,7 +14,7 @@ interface GameContextType {
   advanceWeek: () => void;
   performAction: (params: ActionParams) => void;
   resetGame: () => void;
-  applyForLoan: (amount: number) => void;
+  applyForLoan: (amount: number, maturity?: number) => void;
   applyForLoc: () => void;
   drawFromLoc: (amount: number) => void;
   repayLoc: (amount: number) => void;
@@ -117,9 +117,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setState(null);
   }, []);
 
-  const applyForLoan = useCallback((amount: number) => {
+  const applyForLoan = useCallback((amount: number, maturity?: number) => {
     if (!state) return;
-    const result = engineApplyForLoan(state, amount);
+    const result = engineApplyForLoan(state, amount, maturity);
     if (result.success) updateState(result.state);
   }, [state, updateState]);
 

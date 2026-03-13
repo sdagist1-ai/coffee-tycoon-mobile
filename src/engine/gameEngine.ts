@@ -1580,7 +1580,7 @@ export function getLoanOffers(state: GameState): LoanOffersResult {
   };
 }
 
-export function applyForLoan(state: GameState, amount: number): ActionResult {
+export function applyForLoan(state: GameState, amount: number, maturity?: number): ActionResult {
   const { company } = state;
   if (company.gameOver) return { success: false, error: "Game over.", state };
   if (!company.bankName) return { success: false, error: "No bank selected.", state };
@@ -1598,9 +1598,10 @@ export function applyForLoan(state: GameState, amount: number): ActionResult {
   const totalOutstanding = state.loans.reduce((sum, l) => sum + l.remainingBalance, 0);
   if (totalOutstanding + amount > maxLoan) return { success: false, error: `Total debt would exceed limit of $${maxLoan.toLocaleString()}`, state };
 
+  const loanMaturity = maturity ?? 52;
   const adjustedRate = Math.round(bank.loanRate * creditMult.rateMult);
   const weeklyInterest = Math.round(amount * adjustedRate / 10000 / 52);
-  const weeklyPrincipal = Math.round(amount / 52);
+  const weeklyPrincipal = Math.round(amount / loanMaturity);
   const weeklyPayment = weeklyPrincipal + weeklyInterest;
 
   const newLoan: Loan = {

@@ -31,10 +31,13 @@ function MarginRing({ margin }: { margin: number }) {
 function MenuItemCard({ item, performAction }: { item: MenuItemData; performAction: (params: { action: string; itemId?: number; value?: number; stringValue?: string }) => void }) {
   const priceDollars = item.price / 100;
   const costDollars = item.cost / 100;
-  const margin = costDollars > 0 ? (priceDollars - costDollars) / priceDollars : 0;
+  const rawMargin = costDollars > 0 ? (priceDollars - costDollars) / priceDollars : 0;
+  const margin = Math.min(rawMargin, MAX_MARGIN);
 
   // Calculate max price based on 94% margin cap: price = cost / (1 - 0.94)
-  const maxPrice = Math.floor((costDollars / (1 - MAX_MARGIN)) * 100) / 100;
+  // Round down to nearest 25-cent step so slider can reach full right
+  const maxPriceCents = Math.ceil((costDollars / (1 - MAX_MARGIN)) * 100 / 25) * 25;
+  const maxPrice = maxPriceCents / 100;
   const minPrice = 1.00; // $1.00 minimum
 
   const adjustPrice = (delta: number) => {
