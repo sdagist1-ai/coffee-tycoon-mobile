@@ -267,16 +267,16 @@ function GameShell() {
   ];
 
   return (
-    <div className="pb-safe flex flex-col min-h-screen">
+    <div className="game-shell">
       <div className="pt-safe-or-4 px-4 pb-3 border-b border-amber-800/20 shrink-0">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <Coffee className="w-5 h-5 text-amber-500" />
-                <h1 className="text-lg font-bold text-amber-100">{data.company.name}</h1>
+                <Coffee className="w-5 h-5 text-amber-500 shrink-0"  />
+                <h1 className="text-lg font-bold text-amber-100 truncate">{data.company.name}</h1>
               </div>
-              <div className="flex items-center gap-3 mt-0.5">
+              <div className="flex items-center gap-3 mt-0.5 flex-wrap">
                 <span className="text-amber-400/50 text-xs">{weekToDate(data.company.startDate, data.company.week)}</span>
                 <span className="px-2 py-0.5 bg-amber-600/20 text-amber-400 text-[10px] font-semibold rounded-full uppercase tracking-wider">
                   {data.company.phase}
@@ -284,7 +284,7 @@ function GameShell() {
                 <span className="text-amber-100 text-xs font-semibold">${data.company.cash.toLocaleString()}</span>
               </div>
             </div>
-            <div className="text-right">
+            <div className="text-right shrink-0 ml-2">`
               <div className={`text-sm font-bold ${profitColor(data.company.weeklyProfit)}`}>
                 {data.company.weeklyProfit >= 0 ? "+" : ""}${data.company.weeklyProfit.toLocaleString()}
               </div>
@@ -294,7 +294,7 @@ function GameShell() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto">
+      <div className="game-content">
         <div className="max-w-2xl mx-auto px-4 py-4">
           {tab === "dashboard" && <DashboardTab data={data} onCityClick={(city) => { setCityFilter(city); setTab("stores"); }} />}
           {tab === "stores" && <StoresTab data={data} cityFilter={cityFilter} onClearFilter={() => setCityFilter(null)} />}
@@ -305,7 +305,7 @@ function GameShell() {
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-amber-800/20 bg-amber-950/50 backdrop-blur-sm">
+      <div className="game-tab-bar border-t border-amber-800/20 bg-amber-950/50 backdrop-blur-sm">
         <div className="max-w-2xl mx-auto flex">
           {tabs.map((t) => (
             <button key={t.key} type="button" onClick={() => setTab(t.key)}
@@ -344,7 +344,7 @@ export default function App() {
   return (
     <GameProvider>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');`}</style>
-      <div style={{ fontFamily: "'Rajdhani', sans-serif", background: "linear-gradient(180deg, #1a0e0a 0%, #2d1810 100%)", minHeight: "100vh" }}>
+      <div className="app-root" style={{ fontFamily: "'Rajdhani', sans-serif", background: "linear-gradient(180deg, #1a0e0a 0%, #2d1810 100%)" }}>
         <GameApp />
       </div>
     </GameProvider>
