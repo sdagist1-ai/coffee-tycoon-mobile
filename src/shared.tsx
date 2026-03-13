@@ -79,16 +79,17 @@ export function SectionCard({ title, icon: Icon, children }: { title: string; ic
   );
 }
 
-export function RatingBar({ rating, label }: { rating: number; label: string }) {
+export function RatingBar({ rating, label, maxRaw = 50 }: { rating: number; label: string; maxRaw?: number }) {
+  const stars5 = (rating / maxRaw) * 5;
   return (
     <div className="flex items-center justify-between">
       <span className="text-amber-400/60 text-xs w-20">{label}</span>
       <div className="flex items-center gap-0.5">
         {[1, 2, 3, 4, 5].map((s) => (
-          <Star key={s} className={`w-3.5 h-3.5 ${s <= Math.round(rating) ? "text-amber-400 fill-amber-400" : "text-amber-800/30"}`} />
+          <Star key={s} className={`w-3.5 h-3.5 ${s <= Math.round(stars5) ? "text-amber-400 fill-amber-400" : "text-amber-800/30"}`} />
         ))}
       </div>
-      <span className="text-amber-200/60 text-xs w-6 text-right">{rating.toFixed(1)}</span>
+      <span className="text-amber-200/60 text-xs w-8 text-right">{stars5.toFixed(1)}</span>
     </div>
   );
 }

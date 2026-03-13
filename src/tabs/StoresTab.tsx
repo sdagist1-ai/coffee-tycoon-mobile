@@ -54,7 +54,8 @@ export function StoresTab({ data, cityFilter, onClearFilter }: { data: GameData;
       )}
       {filteredStores.map((store) => {
         const isExpanded = expandedStore === store.id;
-        const avgRating = (store.priceRating + store.productRating + store.serviceRating + store.atmosphereRating) / 4;
+        const avgRatingRaw = (store.priceRating + store.productRating + store.serviceRating + store.atmosphereRating) / 4;
+        const avgRating = (avgRatingRaw / 50) * 5; // Convert 0-50 scale to 0-5
         return (
           <div key={store.id} className="bg-amber-950/20 border border-amber-800/20 rounded-xl overflow-hidden">
             {/* Store Header — always visible, clickable */}
