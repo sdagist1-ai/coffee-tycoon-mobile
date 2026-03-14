@@ -113,3 +113,17 @@ export const FEEDBACK_TEMPLATES = {
   okay: ["It's alright.", "Coffee is okay.", "Nothing special.", "Average experience.", "Decent enough."],
   bad: ["Too expensive.", "Coffee was cold.", "Slow service.", "Not impressed.", "Needs improvement."],
 };
+
+// ─── Pricing & Demand ─────────────────────────────────────────
+// Category-based price elasticity: how sensitive customers are to price by product type
+// Higher = more price-sensitive (customers flee faster when overpriced)
+export const CATEGORY_ELASTICITY: Record<string, number> = {
+  espresso: 1.4,   // Most sensitive — people compare coffee prices constantly
+  cold: 1.2,       // Slightly less sensitive
+  specialty: 0.9,  // People expect to pay more for specialty drinks
+  food: 0.8,       // Least sensitive — food margins are understood
+};
+
+// Base "fair" markup multiplier (cost × this = what customers consider reasonable)
+// Quality and reputation shift this up/down per shop
+export const FAIR_MARKUP_BASE = 3.5;

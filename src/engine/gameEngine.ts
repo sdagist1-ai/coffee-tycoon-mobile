@@ -19,6 +19,8 @@ import {
   LOCATION_SCARCITY,
   COMPETITOR_EXPANSION,
   TECH_BOOST,
+  CATEGORY_ELASTICITY,    // ADD THIS
+  FAIR_MARKUP_BASE,       // ADD THIS
 } from "./constants";
 
 // ─── ID Generation ─────────────────────────────────────────────
@@ -366,28 +368,45 @@ function simulateStore(
   const marketing = findMarketingTier(marketingTier) || MARKETING_TIERS[0]!;
   const city = findCity(store.city) || CITIES[0]!;
 
-  // Customer calculation
+  // ─── Quality calculation (unchanged) ─────────────────────
   const equipmentQuality = store.equipmentLevel / 5; // 0.2 to 1.0
   const decorQuality = store.decorLevel / 5;
   const beanQuality = bean.qualityMult;
   const overallQuality = (equipmentQuality * 0.4 + decorQuality * 0.2 + beanQuality * 0.4);
 
-  // Average menu price and cost (in cents)
-  const avgPrice = enabledMenuList.length > 0
-    ? enabledMenuList.reduce((sum, item) => sum + item.price, 0) / enabledMenuList.length
-    : 400;
-  const avgCost = enabledMenuList.length > 0
-    ? enabledMenuList.reduce((sum, item) => sum + item.cost, 0) / enabledMenuList.length
-    : 100;
-  // Supply/demand: markup ratio drives customer loss. At 2x markup = mild drop, at 5x+ = severe drop
-  const markupRatio = avgCost > 0 ? avgPrice / avgCost : 4;
-  // Sweet spot is 2x-3x markup. Beyond that, customers drop sharply.
-  // At 2x: factor ~1.0, at 5x: factor ~0.45, at 10x: factor ~0.15, at 16x (94% margin): factor ~0.05
-  const priceFactor = Math.max(0.05, Math.min(1.1, 1.6 - (markupRatio * 0.2) - Math.max(0, markupRatio - 3) * 0.15));
+  // ─── Quality-adjusted "fair price" ───────────────────────
+  // Better quality + higher reputation = customers accept higher prices
+  // qualityPremium: 0.7 (terrible shop) to 1.3+ (amazing shop)
+  const qualityPremium = 1 + (overallQuality - 0.5) * 0.6;
+  // reputationPremium: 0.75 (unknown brand) to 1.25 (famous brand)
+  const reputationPremium = 1 + (companyReputation - 50) / 200;
+  // fairMarkup: what customers consider a reasonable price/cost ratio for THIS shop
+  const fairMarkup = FAIR_MARKUP_BASE * qualityPremium * reputationPremium;
 
+  // ─── Per-item demand curves ──────────────────────────────
+  // Each menu item gets its own demand based on its category's price sensitivity
+  // and how its markup compares to the shop's "fair" markup
+  const itemDemands: number[] = [];
+  for (const item of enabledMenuList) {
+    const itemMarkup = item.cost > 0 ? item.price / item.cost : 4;
+    const priceRatio = itemMarkup / fairMarkup; // >1 = overpriced, <1 = bargain
+    const elasticity = CATEGORY_ELASTICITY[item.category] ?? 1.2;
+    // Economic demand curve: demand = priceRatio^(-elasticity)
+    // At fair price (ratio=1): demand=1.0
+    // Below fair: demand > 1.0 (bargain hunters)
+    // Above fair: demand < 1.0 (customers leave)
+    const itemDemand = Math.max(0.05, Math.min(1.3, Math.pow(priceRatio, -elasticity)));
+    itemDemands.push(itemDemand);
+  }
+
+  // Overall price factor = average demand across all items (drives foot traffic)
+  const priceFactor = enabledMenuList.length > 0
+    ? itemDemands.reduce((sum, d) => sum + d, 0) / enabledMenuList.length
+    : 0.5;
+
+  // ─── Customer calculation ────────────────────────────────
   const reputationFactor = 0.4 + (companyReputation / 100) * 0.8;
   const trafficBase = loc.traffic / 7; // weekly to daily-equivalent
-  // Apply city traffic multiplier, demand bias bonus, and competitive pressure
   const demandBonus = enabledMenuList.some((m) => m.category === city.demandBias) ? 1.08 : 1.0;
   const rawCustomers = Math.round(
     trafficBase * overallQuality * priceFactor * reputationFactor *
@@ -400,30 +419,46 @@ function simulateStore(
   if (store.hasManager) capacity = Math.round(capacity * MANAGER_CAPACITY_BOOST);
   const weeklyCustomers = Math.min(rawCustomers * 7, capacity);
 
-  // Revenue calculation: distribute customers across menu items
+  // ─── Revenue: distribute customers by per-item demand ────
+  // Popular (well-priced) items attract more customers than overpriced ones
   let weeklyRevenue = 0;
   let weeklyCOGS = 0;
   if (enabledMenuList.length > 0) {
-    const perItem = weeklyCustomers / enabledMenuList.length;
-    for (const item of enabledMenuList) {
-      weeklyRevenue += Math.round(perItem * item.price / 100);
-      weeklyCOGS += Math.round(perItem * item.cost * bean.qualityMult / 100);
+    const totalDemand = itemDemands.reduce((sum, d) => sum + d, 0);
+    for (let i = 0; i < enabledMenuList.length; i++) {
+      const item = enabledMenuList[i]!;
+      const demand = itemDemands[i]!;
+      // Customers distributed proportionally to each item's demand
+      const itemCustomers = Math.round(weeklyCustomers * (demand / totalDemand));
+      weeklyRevenue += Math.round(itemCustomers * item.price / 100);
+      weeklyCOGS += Math.round(itemCustomers * item.cost * bean.qualityMult / 100);
     }
   }
 
-  // Labor costs
+  // ─── Labor costs ─────────────────────────────────────────
   const laborCost = store.baristas * BARISTA_WEEKLY_SALARY + (store.hasManager ? MANAGER_WEEKLY_SALARY : 0);
 
-  // Satisfaction (0-100)
+  // ─── Satisfaction (0-100) ────────────────────────────────
   const staffRatio = weeklyCustomers > 0 ? Math.min(1, capacity / weeklyCustomers) : 1;
   const satisfaction = Math.round(Math.min(100, (overallQuality * 50 + staffRatio * 30 + (enabledMenuList.length / 8) * 20)));
 
   // Apply city rent multiplier
   const adjustedRent = Math.round(store.weeklyRent * city.rentMult);
 
-  
-  // Price rating based on markup: 2x markup = great (45), 5x = mediocre (25), 10x+ = terrible (5)
-  const priceRating = Math.round(Math.min(50, Math.max(5, 55 - markupRatio * 5)));
+  // ─── Ratings (0-50 scale, displayed as 0-5 stars) ───────
+  // Price rating = perceived value (quality-adjusted, not raw markup)
+  // A great shop charging premium prices gets a better price rating
+  // than a basic shop charging the same prices
+  const avgPrice = enabledMenuList.length > 0
+    ? enabledMenuList.reduce((sum, item) => sum + item.price, 0) / enabledMenuList.length
+    : 400;
+  const avgCost = enabledMenuList.length > 0
+    ? enabledMenuList.reduce((sum, item) => sum + item.cost, 0) / enabledMenuList.length
+    : 100;
+  const avgMarkup = avgCost > 0 ? avgPrice / avgCost : 4;
+  const perceivedValue = fairMarkup / avgMarkup; // >1 = customers think it's a deal
+  const priceRating = Math.round(Math.max(5, Math.min(50, perceivedValue * 25 + 5)));
+
   const productRating = Math.round(Math.min(50, (beanQuality * 25 + (enabledMenuList.length / 8) * 15 + equipmentQuality * 10)));
   const serviceRating = Math.round(Math.min(50, (staffRatio * 30 + (store.hasManager ? 12 : 0) + (store.baristas / 8) * 8)));
   const atmosphereRating = Math.round(Math.min(50, (decorQuality * 40 + equipmentQuality * 10)));
